@@ -146,17 +146,6 @@ const Lab = () => {
 
   return (
     <div className="lab-container" style={{ position: 'relative', height: '100%', width: '100%' }}>
-      {isLoading && (
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(255,255,255,0.8)', zIndex: 100,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-        }}>
-          <Loader2 className="animate-spin" size={48} color="#007AFF" style={{ animation: 'spin 1s linear infinite' }} />
-          <p style={{ marginTop: '16px', fontWeight: 500, color: '#333' }}>正在从 Figma 并发拉取 8 个真实画板数据...</p>
-        </div>
-      )}
-      
       {error && (
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0,
@@ -167,7 +156,7 @@ const Lab = () => {
         </div>
       )}
 
-      <GeneratorCanvas />
+      <GeneratorCanvas isLoading={isLoading} />
     </div>
   );
 };

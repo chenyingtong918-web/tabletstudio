@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect, useContext, useMemo } from 'react';
-import { Cloud, Undo, Redo, Code, Play, Download, RefreshCw, Share2, X, Grid3X3 } from 'lucide-react';
+import { Cloud, Undo, Redo, Code, Play, Download, RefreshCw, Share2, X, Grid3X3, Loader2 } from 'lucide-react';
 import { ChatContext } from '../data/ChatContext';
 import { generateVirtualLayouts, BREAKPOINTS_CONFIG } from '../utils/layoutEngine';
 import './GeneratorCanvas.css';
@@ -89,7 +89,7 @@ const GridOverlay = ({ show, width, breakpoint }) => {
   );
 };
 
-const GeneratorCanvas = () => {
+const GeneratorCanvas = ({ isLoading }) => {
   const [breakpoint, setBreakpoint] = useState('Medium');
   const [orientation, setOrientation] = useState('Landscape');
   const [scale, setScale] = useState(0.8);
@@ -246,10 +246,43 @@ const GeneratorCanvas = () => {
             position: 'relative'
           }}
         >
-          {activeLayout ? (
-            <div key={`${breakpoint}-${orientation}`} className="canvas-content-wrapper">
-              <VirtualNodeRenderer node={activeLayout.vNode} imagesMap={figmaImages} />
-              <GridOverlay show={showGrid} width={activeLayout.size.width} breakpoint={breakpoint} />
+          {isLoading && (
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(255,255,255,0.9)', zIndex: 100,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)'
+            }}>
+              <Loader2 className="animate-spin" size={48} color="#007AFF" style={{ animation: 'spin 1s linear infinite' }} />
+              <p style={{ marginTop: '16px', fontWeight: 500, color: '#333' }}>正在拉取真实画板数据...</p>
+            </div>
+          )}
+
+          {layouts && Object.keys(layouts).length > 0 ? (
+            <div className="layouts-container" style={{ position: 'relative', width: '100%', height: '100%' }}>
+              {Object.entries(layouts).map(([bp, orientations]) => 
+                Object.entries(orientations).map(([ori, layout]) => {
+                  const isActive = breakpoint === bp && orientation === ori;
+                  if (!layout) return null;
+                  
+                  return (
+                    <div 
+                      key={`${bp}-${ori}`} 
+                      className={`canvas-content-wrapper ${isActive ? 'active-layout' : ''}`}
+                      style={{ 
+                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                        opacity: isActive ? 1 : 0,
+                        pointerEvents: isActive ? 'auto' : 'none',
+                        zIndex: isActive ? 10 : 1,
+                        transition: 'opacity 0.05s ease'
+                      }}
+                    >
+                      <VirtualNodeRenderer node={layout.vNode} imagesMap={figmaImages} />
+                      <GridOverlay show={showGrid} width={layout.size.width} breakpoint={bp} />
+                    </div>
+                  );
+                })
+              )}
             </div>
           ) : (
             <div className="placeholder-content">
