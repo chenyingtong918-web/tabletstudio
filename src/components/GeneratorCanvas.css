@@ -123,7 +123,7 @@
   color: var(--text-secondary);
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(0, 0, 0, 0.04);
-  transition: all var(--transition-normal);
+  transition: box-shadow var(--transition-normal), border var(--transition-normal);
   overflow: hidden;
 }
 
