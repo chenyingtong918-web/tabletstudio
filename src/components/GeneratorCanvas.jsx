@@ -18,11 +18,10 @@ const VirtualNodeRenderer = ({ node, imagesMap }) => {
       top: `${node.y || 0}px`,
       width: `${node.width || 0}px`,
       height: `${node.height || 0}px`,
-      border: imageUrl ? 'none' : '1px solid red',
-      backgroundColor: imageUrl ? 'transparent' : 'rgba(255,0,0,0.1)',
+      border: imageUrl ? 'none' : '1px solid rgba(0,0,0,0.1)',
+      backgroundColor: imageUrl ? 'transparent' : 'rgba(0,0,0,0.02)',
       boxSizing: 'border-box',
-      overflow: 'hidden',
-      outline: '1px solid blue'
+      overflow: 'hidden'
     };
 
     if (!imageUrl && node.fills && Array.isArray(node.fills) && node.fills.length > 0 && node.fills[0].type === 'SOLID' && node.fills[0].color) {
@@ -34,7 +33,7 @@ const VirtualNodeRenderer = ({ node, imagesMap }) => {
       <div style={style} title={`${node.name}\nRule: ${node.appliedRule || 'None'}`}>
         {imageUrl ? (
           <>
-            <img src={imageUrl} alt={node.name} style={{ width: '100%', height: '100%', objectFit: 'fill', display: 'block' }} />
+            <img src={imageUrl} alt={node.name} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
             {node.appliedRule && node.appliedRule !== 'Fallback: Root' && (
               <div style={{
                 position: 'absolute', top: 0, left: 0, background: 'rgba(0,120,255,0.8)', 
