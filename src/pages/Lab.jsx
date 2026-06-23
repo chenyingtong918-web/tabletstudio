@@ -58,7 +58,7 @@ const Lab = () => {
             const childIds = node.children.map(c => c.id).join(',');
             if (childIds) {
               try {
-                const imagesMap = await fetchFigmaImage(figmaMatch.fileKey, childIds);
+                const imagesMap = await fetchFigmaImage(figmaMatch.fileKey, childIds, 'png', 2);
                 mergedImagesMap = { ...mergedImagesMap, ...imagesMap };
               } catch (imgError) {
                 console.error("Failed to fetch figma images:", imgError);
@@ -73,7 +73,7 @@ const Lab = () => {
         if (layoutKeys.length > 0) {
           // ALSO fetch the root image for nodeData so Compact Portrait is 1:1
           try {
-            const rootImageMap = await fetchFigmaImage(figmaMatch.fileKey, nodeData.id);
+            const rootImageMap = await fetchFigmaImage(figmaMatch.fileKey, nodeData.id, 'png', 2);
             if (rootImageMap) {
               mergedImagesMap = { ...mergedImagesMap, ...rootImageMap };
             }
@@ -86,7 +86,7 @@ const Lab = () => {
             try {
               const layoutNode = await fetchFigmaNode(figmaMatch.fileKey, id);
               // Fetch root image for 1:1 perfect rendering
-              const rootImageMap = await fetchFigmaImage(figmaMatch.fileKey, id);
+              const rootImageMap = await fetchFigmaImage(figmaMatch.fileKey, id, 'png', 2);
               if (rootImageMap) {
                 mergedImagesMap = { ...mergedImagesMap, ...rootImageMap };
               }
@@ -124,6 +124,14 @@ const Lab = () => {
         }
 
         setFigmaImages(mergedImagesMap);
+
+        // Preload all images in the background to prevent UI lag when switching tabs
+        Object.values(mergedImagesMap).forEach(url => {
+          if (url) {
+            const img = new Image();
+            img.src = url;
+          }
+        });
 
       } catch (err) {
         console.error(err);
