@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useContext, useMemo } from 'react';
 import { Cloud, Undo, Redo, Code, Play, Download, RefreshCw, Share2, X, Grid3X3 } from 'lucide-react';
 import { ChatContext } from '../data/ChatContext';
 import { generateVirtualLayouts, BREAKPOINTS_CONFIG } from '../utils/layoutEngine';
@@ -166,7 +166,7 @@ const GeneratorCanvas = () => {
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const workspace = workspaceRef.current;
     if (!workspace) return;
 
@@ -246,7 +246,6 @@ const GeneratorCanvas = () => {
             position: 'relative'
           }}
         >
-          {console.log("Canvas Rendering activeLayout:", activeLayout, "figmaImages:", figmaImages)}
           {activeLayout ? (
             <>
               <VirtualNodeRenderer node={activeLayout.vNode} imagesMap={figmaImages} />
