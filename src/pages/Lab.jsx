@@ -67,15 +67,29 @@ const Lab = () => {
           }
         };
 
-        // Fetch images for original node
+        // Fetch images for original node (children images for dynamic layouts)
         await fetchImagesForNode(nodeData);
 
         if (layoutKeys.length > 0) {
+          // ALSO fetch the root image for nodeData so Compact Portrait is 1:1
+          try {
+            const rootImageMap = await fetchFigmaImage(figmaMatch.fileKey, nodeData.id);
+            if (rootImageMap) {
+              mergedImagesMap = { ...mergedImagesMap, ...rootImageMap };
+            }
+          } catch (e) {
+            console.error("Failed to fetch root image for original node", e);
+          }
+
           // Fetch pre-generated layouts concurrently
           const fetchPromises = layoutKeys.map(async ({ key, id }) => {
             try {
               const layoutNode = await fetchFigmaNode(figmaMatch.fileKey, id);
-              await fetchImagesForNode(layoutNode);
+              // Fetch root image for 1:1 perfect rendering
+              const rootImageMap = await fetchFigmaImage(figmaMatch.fileKey, id);
+              if (rootImageMap) {
+                mergedImagesMap = { ...mergedImagesMap, ...rootImageMap };
+              }
               return { key, layoutNode };
             } catch (err) {
               console.error(`Failed to fetch node ${id}`, err);
