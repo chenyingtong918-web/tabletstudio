@@ -95,7 +95,7 @@ const GeneratorCanvas = () => {
   const [scale, setScale] = useState(0.8);
   const [showGrid, setShowGrid] = useState(false);
   const workspaceRef = useRef(null);
-  const { figmaData, figmaImages } = useContext(ChatContext);
+  const { figmaData, figmaImages, preGeneratedLayouts } = useContext(ChatContext);
 
   // Auto-detect breakpoint based on root frame dimensions
   useEffect(() => {
@@ -124,6 +124,10 @@ const GeneratorCanvas = () => {
   }, [figmaData]);
 
   const layouts = useMemo(() => {
+    if (preGeneratedLayouts && Object.keys(preGeneratedLayouts).length > 0) {
+      // If we have pre-generated layouts from Figma URL params, use them!
+      return preGeneratedLayouts;
+    }
     if (!figmaData) return null;
     try {
       return generateVirtualLayouts(figmaData);
@@ -131,7 +135,7 @@ const GeneratorCanvas = () => {
       console.error("Layout Generation Error:", e);
       return null;
     }
-  }, [figmaData]);
+  }, [figmaData, preGeneratedLayouts]);
 
   const activeLayout = useMemo(() => {
     if (!layouts || Object.keys(layouts).length === 0) return null;

@@ -7,6 +7,7 @@ export const ChatProvider = ({ children }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [figmaData, setFigmaData] = useState(null);
   const [figmaImages, setFigmaImages] = useState(null);
+  const [preGeneratedLayouts, setPreGeneratedLayouts] = useState(null);
 
   const addSession = (id, title, messages) => {
     setSessions((prev) => [
@@ -39,9 +40,12 @@ export const ChatProvider = ({ children }) => {
         figmaData,
         setFigmaData,
         figmaImages,
-        setFigmaImages
+        setFigmaImages,
+        preGeneratedLayouts,
+        setPreGeneratedLayouts
       }}>
       {children}
     </ChatContext.Provider>
   );
 };
+
