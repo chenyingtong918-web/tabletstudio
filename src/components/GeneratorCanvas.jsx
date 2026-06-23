@@ -247,10 +247,10 @@ const GeneratorCanvas = () => {
           }}
         >
           {activeLayout ? (
-            <>
+            <div key={`${breakpoint}-${orientation}`} className="canvas-content-wrapper">
               <VirtualNodeRenderer node={activeLayout.vNode} imagesMap={figmaImages} />
               <GridOverlay show={showGrid} width={activeLayout.size.width} breakpoint={breakpoint} />
-            </>
+            </div>
           ) : (
             <div className="placeholder-content">
               <p>Canvas Preview Area</p>
