@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import GeneratorCanvas from '../components/GeneratorCanvas';
 import { ChatContext } from '../data/ChatContext';
 import { parseFigmaUrl, fetchFigmaNode, fetchFigmaImage } from '../utils/figmaApi';
+import { transformFigmaNodeToVirtualNode } from '../utils/layoutEngine';
 import { Loader2 } from 'lucide-react';
 import './Lab.css';
 
@@ -87,7 +88,7 @@ const Lab = () => {
           const preGenMap = {
             Compact: {
               Portrait: {
-                vNode: nodeData,
+                vNode: transformFigmaNodeToVirtualNode(nodeData),
                 size: { width: nodeData.absoluteBoundingBox?.width || 0, height: nodeData.absoluteBoundingBox?.height || 0 }
               }
             }
@@ -97,7 +98,7 @@ const Lab = () => {
               const [breakpoint, orientation] = result.key.split('_');
               if (!preGenMap[breakpoint]) preGenMap[breakpoint] = {};
               preGenMap[breakpoint][orientation] = {
-                vNode: result.layoutNode,
+                vNode: transformFigmaNodeToVirtualNode(result.layoutNode),
                 size: { width: result.layoutNode.absoluteBoundingBox?.width || 0, height: result.layoutNode.absoluteBoundingBox?.height || 0 }
               };
             }

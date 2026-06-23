@@ -18,10 +18,11 @@ const VirtualNodeRenderer = ({ node, imagesMap }) => {
       top: `${node.y || 0}px`,
       width: `${node.width || 0}px`,
       height: `${node.height || 0}px`,
-      border: imageUrl ? 'none' : '1px solid rgba(0,0,0,0.1)',
-      backgroundColor: imageUrl ? 'transparent' : 'rgba(0,0,0,0.02)',
+      border: imageUrl ? 'none' : '1px solid red',
+      backgroundColor: imageUrl ? 'transparent' : 'rgba(255,0,0,0.1)',
       boxSizing: 'border-box',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      outline: '1px solid blue'
     };
 
     if (!imageUrl && node.fills && Array.isArray(node.fills) && node.fills.length > 0 && node.fills[0].type === 'SOLID' && node.fills[0].color) {
@@ -246,6 +247,7 @@ const GeneratorCanvas = () => {
             position: 'relative'
           }}
         >
+          {console.log("Canvas Rendering activeLayout:", activeLayout, "figmaImages:", figmaImages)}
           {activeLayout ? (
             <>
               <VirtualNodeRenderer node={activeLayout.vNode} imagesMap={figmaImages} />
