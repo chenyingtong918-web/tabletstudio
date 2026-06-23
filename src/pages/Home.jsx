@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { parseFigmaUrl, fetchFigmaNode, fetchFigmaImage } from '../utils/figmaApi';
 import { ChatContext } from '../data/ChatContext';
 import { Search, PenTool, Code, Paperclip, ArrowUp, Bot, User, Plus, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
@@ -10,19 +11,21 @@ import './Home.css';
 const Home = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { sessions, addSession, updateSession } = useContext(ChatContext);
+  const { sessions, addSession, updateSession, isTyping, setIsTyping, setFigmaData, setFigmaImages } = useContext(ChatContext);
   
   const activeSession = id ? sessions.find(s => s.id === id) : null;
   const messages = activeSession ? activeSession.messages : [];
 
   const [query, setQuery] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     setQuery('');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     setSelectedImages([]);
   }, [id]);
 
@@ -112,12 +115,12 @@ const Home = () => {
     const newMessages = [...messages, { role: 'user', content: finalContent }];
     
     let currentId = id;
-    if (!currentId) {
-      currentId = Date.now().toString();
+    const sessionExists = sessions.some(s => s.id === currentId);
+
+    if (!currentId || !sessionExists) {
+      if (!currentId) currentId = Date.now().toString();
       const title = query.trim().slice(0, 20) || 'Image Review';
       addSession(currentId, title, newMessages);
-      // Optional: Add a slight delay so context updates before navigation if needed, 
-      // but React router handles sync well.
       navigate(`/c/${currentId}`);
     } else {
       updateSession(currentId, newMessages);
@@ -127,7 +130,63 @@ const Home = () => {
     setSelectedImages([]);
     setIsTyping(true);
 
-    // Create placeholder for AI response
+    // Figma URL Interception
+    let figmaMatch = null;
+    try {
+      figmaMatch = parseFigmaUrl(query);
+    } catch (e) {
+      updateSession(currentId, prev => [
+        ...prev,
+        { role: 'assistant', content: `❌ 链接解析失败: ${e.message}` }
+      ]);
+      setIsTyping(false);
+      return;
+    }
+
+    if (figmaMatch) {
+      updateSession(currentId, prev => [
+        ...prev,
+        { role: 'assistant', content: `正在从 Figma 抓取数据 (File: ${figmaMatch.fileKey}, Node: ${figmaMatch.nodeId || 'All'})...` }
+      ]);
+      
+      try {
+        const nodeData = await fetchFigmaNode(figmaMatch.fileKey, figmaMatch.nodeId);
+        setFigmaData(nodeData);
+
+        try {
+          if (nodeData && nodeData.children && Array.isArray(nodeData.children)) {
+            const childIds = nodeData.children.map(c => c.id).join(',');
+            if (childIds) {
+              const imagesMap = await fetchFigmaImage(figmaMatch.fileKey, childIds);
+              setFigmaImages(imagesMap);
+              
+              updateSession(currentId, prev => [
+                ...prev.slice(0, -1),
+                { role: 'assistant', content: `✅ Figma 数据抓取成功！并且成功获取到了 ${Object.keys(imagesMap).length} 张高保真图片切图，已经在右侧生成了带图片的真实预览。` }
+              ]);
+            }
+          }
+        } catch (imgError) {
+          console.error("Failed to fetch figma images:", imgError);
+          updateSession(currentId, prev => [
+            ...prev.slice(0, -1),
+            { role: 'assistant', content: `✅ Figma 数据抓取成功，在右侧生成了真实预览。\n\n⚠️ 但获取高保真图片失败了 (原因: ${imgError.message})，因此退化为线框模式。` }
+          ]);
+        }
+
+        setIsTyping(false);
+        return; // Don't call regular AI simulation
+      } catch (e) {
+        updateSession(currentId, prev => [
+          ...prev.slice(0, -1),
+          { role: 'assistant', content: `❌ Figma 抓取失败: ${e.message}\n请确保你已在设置中配置了正确的 Personal Access Token。` }
+        ]);
+        setIsTyping(false);
+        return;
+      }
+    }
+
+    // Create placeholder for regular AI response
     updateSession(currentId, prev => [...prev, { role: 'system', content: '' }]);
 
     await aiService.streamMessage(newMessages, (fullText) => {
@@ -143,9 +202,10 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      {messages.length === 0 ? (
-        <div className="home-content">
-          <header className="home-header">
+      <div className="chat-pane">
+        {messages.length === 0 ? (
+          <div className="home-content">
+            <header className="home-header">
             <h1 className="title">Welcome to Tablet Studio</h1>
             <p className="subtitle">
               Your personal AI assistant for multi-breakpoint tablet design adaptation
@@ -252,6 +312,7 @@ const Home = () => {
                </button>
             </div>
          </div>
+      </div>
       </div>
     </div>
   );

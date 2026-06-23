@@ -10,14 +10,45 @@
   flex-direction: column;
   height: calc(100vh - 32px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  z-index: 100;
 }
 
 .nav-brand {
-  padding: 28px 24px 12px 24px;
+  padding: 24px 24px 16px 24px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 4px;
+  transition: padding 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.side-nav.collapsed .nav-brand {
+  padding: 24px 0 16px 0;
+  justify-content: center;
+}
+
+.collapse-toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all var(--transition-fast);
+}
+
+.collapse-toggle-btn:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.collapse-toggle-btn svg rect {
+  rx: 5px;
 }
 
 .brand-icon {
@@ -120,4 +151,54 @@
   background-color: var(--bg-tertiary);
   color: var(--text-primary);
   font-weight: 600;
+}
+
+.side-nav.collapsed {
+  width: 80px;
+  align-items: center;
+}
+
+.side-nav.collapsed .nav-brand {
+  padding: 28px 0 12px 0;
+  justify-content: center;
+}
+
+.side-nav.collapsed .nav-item {
+  justify-content: center;
+  padding: 12px;
+}
+
+.side-nav.collapsed .nav-item span {
+  display: none;
+}
+
+.side-nav.collapsed .recent-section {
+  padding: 0 8px;
+}
+
+.side-nav.collapsed .recent-item {
+  justify-content: center;
+  padding: 12px;
+}
+
+.side-nav.collapsed .recent-item span {
+  display: none;
+}
+
+.nav-footer {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid var(--border-light);
+  position: relative;
+}
+
+.side-nav.collapsed .nav-footer {
+  padding: 16px 8px;
+}
+
+.settings-btn {
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
 }

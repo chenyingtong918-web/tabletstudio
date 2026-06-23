@@ -4,6 +4,9 @@ export const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
   const [sessions, setSessions] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [figmaData, setFigmaData] = useState(null);
+  const [figmaImages, setFigmaImages] = useState(null);
 
   const addSession = (id, title, messages) => {
     setSessions((prev) => [
@@ -27,7 +30,17 @@ export const ChatProvider = ({ children }) => {
   };
 
   return (
-    <ChatContext.Provider value={{ sessions, addSession, updateSession }}>
+    <ChatContext.Provider value={{ 
+        sessions, 
+        addSession, 
+        updateSession, 
+        isTyping,
+        setIsTyping,
+        figmaData,
+        setFigmaData,
+        figmaImages,
+        setFigmaImages
+      }}>
       {children}
     </ChatContext.Provider>
   );

@@ -2,9 +2,31 @@
   width: 100%;
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   padding: 0;
   height: 100%;
+  overflow: hidden;
+}
+
+.chat-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.home-container.generator-mode .chat-pane {
+  flex: 0 0 420px;
+}
+
+.generator-pane {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 16px 0;
   overflow: hidden;
 }
 
@@ -156,6 +178,11 @@
 .chat-action-pill:hover {
   background-color: var(--border-light);
   color: var(--text-primary);
+}
+
+.chat-action-pill.active-pill {
+  background-color: var(--accent-soft);
+  color: var(--accent-primary);
 }
 
 .chat-attach-btn {

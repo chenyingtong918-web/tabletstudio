@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navigation from './components/Navigation';
 import Home from './pages/Home';
+import Lab from './pages/Lab';
 import { ChatProvider } from './data/ChatContext';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/c/:id" element={<Home />} />
+              <Route path="/lab" element={<Lab />} />
             </Routes>
           </main>
         </div>
